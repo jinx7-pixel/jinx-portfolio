@@ -31,12 +31,18 @@
         a.addEventListener('click', () => setMenu(false));
     });
 
-    // Close menu on resize to desktop
+    // Close menu on resize to desktop.
+    // 1280px is Tailwind's `xl` breakpoint — the exact width where #mobile-menu
+    // becomes `xl:hidden` and the inline .nav-link list becomes `xl:flex`.
+    // The old 768px (`md`) value closed the menu on tablets, where the hamburger
+    // is the ONLY navigation, so any resize event (iPad/Android URL bar collapse,
+    // orientation change, soft keyboard) made the menu vanish and the site
+    // look unresponsive. Keep this number in sync with the `xl:` classes above.
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(() => {
-            if (window.innerWidth >= 768) setMenu(false);
+            if (window.innerWidth >= 1280) setMenu(false);
         }, 150);
     });
 
@@ -130,6 +136,229 @@
     });
 
     /* ----------------------------------------------------------------------
+       Mobile-only scroll sequence for the Projects cards
+       ---------------------------------------------------------------------- */
+    const projectsSection = document.getElementById('projects');
+    const projectsTrack = projectsSection?.querySelector('.projects-scroll-track');
+    const projectsStack = projectsSection?.querySelector('.project-card-stack');
+    const projectCards = projectsStack
+        ? Array.from(projectsStack.querySelectorAll('.project-card'))
+        : [];
+
+    if (projectsTrack && projectsStack && projectCards.length === 3) {
+        const mobileProjectsQuery = window.matchMedia('(max-width: 767px)');
+        const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let projectSequenceEnabled = false;
+        let projectScrollFrame = null;
+        let renderedProjectPosition = null;
+
+        const clampProjectProgress = (value, min, max) => Math.min(max, Math.max(min, value));
+        const easeProjectProgress = (value) => value * value * (3 - (2 * value));
+
+        function updateProjectStack() {
+            projectScrollFrame = null;
+            if (!projectSequenceEnabled) return;
+
+            const trackRect = projectsTrack.getBoundingClientRect();
+            const stackHeight = projectsStack.getBoundingClientRect().height;
+            const trackHeight = trackRect.height;
+            const stickyTop = parseFloat(window.getComputedStyle(projectsStack).top) || 0;
+            const scrollRange = Math.max(1, trackHeight - stackHeight);
+            const trackDocumentTop = window.scrollY + trackRect.top;
+            const sequenceStart = trackDocumentTop - stickyTop;
+            const progress = clampProjectProgress(
+                (window.scrollY - sequenceStart) / scrollRange,
+                0,
+                1
+            );
+            const targetPosition = progress * (projectCards.length - 1);
+            renderedProjectPosition = renderedProjectPosition === null
+                ? targetPosition
+                : renderedProjectPosition + ((targetPosition - renderedProjectPosition) * 0.18);
+
+            const sequencePosition = renderedProjectPosition;
+            const activeIndex = Math.min(
+                projectCards.length - 1,
+                Math.floor(sequencePosition)
+            );
+            const segmentProgress = activeIndex === projectCards.length - 1
+                ? 0
+                : sequencePosition - activeIndex;
+            const exitProgress = clampProjectProgress((segmentProgress - 0.5) * 2, 0, 1);
+            const visibleCardIndex = Math.min(
+                projectCards.length - 1,
+                Math.round(sequencePosition)
+            );
+            const entryOffset = (stackHeight * 0.2) + 16;
+
+            projectCards.forEach((card, index) => {
+                let y = 0;
+                let scale = 1;
+                let opacity = 1;
+                let zIndex = 100;
+
+                if (index < activeIndex) {
+                    y = -stackHeight * 1.08;
+                    scale = 0.94;
+                    opacity = 0.18;
+                    zIndex = 10 + index;
+                } else if (index === activeIndex) {
+                    y = -stackHeight * 1.08 * exitProgress;
+                    scale = 1 - (0.06 * exitProgress);
+                    zIndex = segmentProgress < 0.5 ? 200 : 190;
+                } else if (index === activeIndex + 1) {
+                    const entryProgress = easeProjectProgress(segmentProgress);
+                    y = entryOffset * (1 - entryProgress);
+                    scale = 0.96 + (0.04 * entryProgress);
+                    opacity = 0.6 + (0.4 * entryProgress);
+                    zIndex = segmentProgress >= 0.5 ? 201 : 150 - index;
+                } else {
+                    const isPreparingNext = index === activeIndex + 2;
+                    const prepareProgress = isPreparingNext
+                        ? easeProjectProgress(clampProjectProgress((segmentProgress - 0.76) / 0.24, 0, 1))
+                        : 0;
+                    y = 16 + ((entryOffset - 16) * prepareProgress);
+                    scale = 0.92 + (0.04 * prepareProgress);
+                    opacity = 0.18 + (0.42 * prepareProgress);
+                    zIndex = 120 - index;
+                }
+
+                card.style.transform = `translate3d(0, ${y}px, 0) scale(${scale})`;
+                card.style.opacity = String(opacity);
+                card.style.zIndex = String(zIndex);
+                card.classList.toggle('has-visible-content', index === visibleCardIndex);
+            });
+
+            if (Math.abs(targetPosition - renderedProjectPosition) > 0.001) {
+                scheduleProjectStackUpdate();
+            }
+        }
+
+        function scheduleProjectStackUpdate() {
+            if (!projectSequenceEnabled || projectScrollFrame !== null) return;
+            projectScrollFrame = window.requestAnimationFrame(updateProjectStack);
+        }
+
+        function stopProjectSequence() {
+            if (!projectSequenceEnabled) return;
+            projectSequenceEnabled = false;
+            window.removeEventListener('scroll', scheduleProjectStackUpdate);
+            window.removeEventListener('resize', scheduleProjectStackUpdate);
+            if (projectScrollFrame !== null) {
+                window.cancelAnimationFrame(projectScrollFrame);
+                projectScrollFrame = null;
+            }
+
+            projectsTrack.classList.remove('is-project-sequence');
+            projectsStack.classList.remove('is-project-sequence');
+            renderedProjectPosition = null;
+            projectCards.forEach((card) => {
+                card.classList.remove('is-project-sequence-card', 'has-visible-content');
+                card.style.removeProperty('transform');
+                card.style.removeProperty('opacity');
+                card.style.removeProperty('z-index');
+            });
+        }
+
+        function startProjectSequence() {
+            if (projectSequenceEnabled) return;
+            projectSequenceEnabled = true;
+            projectsTrack.classList.add('is-project-sequence');
+            projectsStack.classList.add('is-project-sequence');
+            projectCards.forEach((card) => card.classList.add('is-project-sequence-card'));
+            window.addEventListener('scroll', scheduleProjectStackUpdate, { passive: true });
+            window.addEventListener('resize', scheduleProjectStackUpdate, { passive: true });
+            updateProjectStack();
+        }
+
+        function syncProjectSequenceMode() {
+            if (mobileProjectsQuery.matches && !reducedMotionQuery.matches) {
+                startProjectSequence();
+            } else {
+                stopProjectSequence();
+            }
+        }
+
+        [mobileProjectsQuery, reducedMotionQuery].forEach((mediaQuery) => {
+            if (typeof mediaQuery.addEventListener === 'function') {
+                mediaQuery.addEventListener('change', syncProjectSequenceMode);
+            } else {
+                mediaQuery.addListener(syncProjectSequenceMode);
+            }
+        });
+        syncProjectSequenceMode();
+    }
+
+    /* ----------------------------------------------------------------------
+       Mobile-only accordion for the Skills cards
+       ---------------------------------------------------------------------- */
+    const skillsSection = document.getElementById('skills');
+    const skillCards = skillsSection
+        ? Array.from(skillsSection.querySelectorAll('.skill-card'))
+        : [];
+
+    if (skillCards.length) {
+        const mobileSkillsQuery = window.matchMedia('(max-width: 767px)');
+
+        const getToggle = (card) => card.querySelector('.skill-toggle');
+
+        function setSkillOpen(card, open) {
+            card.classList.toggle('is-open', open);
+            const toggle = getToggle(card);
+            if (toggle) toggle.setAttribute('aria-expanded', String(open));
+        }
+
+        function toggleSkill(card) {
+            if (card.classList.contains('is-open')) {
+                setSkillOpen(card, false);
+                return;
+            }
+            // Accordion behaviour: only one skill stays expanded at a time.
+            skillCards.forEach((other) => {
+                if (other !== card) setSkillOpen(other, false);
+            });
+            setSkillOpen(card, true);
+        }
+
+        // One handler on the card: clicks on the title button bubble up here,
+        // and the button gives us native keyboard support (Enter / Space).
+        function onSkillCardClick(e) {
+            if (!mobileSkillsQuery.matches) return;
+            toggleSkill(e.currentTarget);
+        }
+
+        function syncSkillAccordionMode() {
+            const isMobile = mobileSkillsQuery.matches;
+            skillCards.forEach((card) => {
+                const toggle = getToggle(card);
+                if (isMobile) {
+                    if (toggle) {
+                        toggle.disabled = false;
+                        toggle.setAttribute('aria-expanded', 'false');
+                    }
+                } else {
+                    if (toggle) {
+                        toggle.disabled = true;
+                        toggle.removeAttribute('aria-expanded');
+                    }
+                }
+                card.classList.remove('is-open');
+            });
+        }
+
+        skillCards.forEach((card) => {
+            card.addEventListener('click', onSkillCardClick);
+        });
+
+        if (typeof mobileSkillsQuery.addEventListener === 'function') {
+            mobileSkillsQuery.addEventListener('change', syncSkillAccordionMode);
+        } else {
+            mobileSkillsQuery.addListener(syncSkillAccordionMode);
+        }
+        syncSkillAccordionMode();
+    }
+
+    /* ----------------------------------------------------------------------
        5) Typing effect for hero role
        ---------------------------------------------------------------------- */
     const typedEl = document.getElementById('typed');
@@ -167,36 +396,6 @@
     }
 
     /* ----------------------------------------------------------------------
-       6) Stat number count-up
-       ---------------------------------------------------------------------- */
-    const statNums = document.querySelectorAll('[data-count]');
-    if ('IntersectionObserver' in window && statNums.length) {
-        const countObserver = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (!entry.isIntersecting) return;
-                    const el = entry.target;
-                    const target = parseInt(el.dataset.count, 10) || 0;
-                    const duration = 1400;
-                    const start = performance.now();
-                    function step(now) {
-                        const t = Math.min((now - start) / duration, 1);
-                        const eased = 1 - Math.pow(1 - t, 3);
-                        const val = Math.floor(eased * target);
-                        el.textContent = val + '+';
-                        if (t < 1) requestAnimationFrame(step);
-                        else el.textContent = target + '+';
-                    }
-                    requestAnimationFrame(step);
-                    countObserver.unobserve(el);
-                });
-            },
-            { threshold: 0.4 }
-        );
-        statNums.forEach((el) => countObserver.observe(el));
-    }
-
-    /* ----------------------------------------------------------------------
        7) Back-to-top button
        ---------------------------------------------------------------------- */
     const backBtn = document.getElementById('back-to-top');
@@ -211,67 +410,7 @@
     if (yearEl) yearEl.textContent = new Date().getFullYear();
 
     /* ----------------------------------------------------------------------
-       9) Contact form handler (posts to backend /api/contact)
-       ---------------------------------------------------------------------- */
-    window.handleSubmit = function (e) {
-        e.preventDefault();
-        const form = e.target;
-        const status = document.getElementById('form-status');
-        const btn = form.querySelector('button[type="submit"]');
-        if (btn) {
-            btn.disabled = true;
-            btn.classList.add('opacity-70');
-        }
-
-        const payload = {
-            name: form.elements.name?.value?.trim() ?? '',
-            email: form.elements.email?.value?.trim() ?? '',
-            subject: form.elements.subject?.value?.trim() ?? '',
-            message: form.elements.message?.value?.trim() ?? '',
-        };
-
-        const setStatus = (text, ok) => {
-            if (!status) return;
-            status.textContent = text;
-            status.classList.remove('hidden', 'text-emerald-400', 'text-rose-400');
-            status.classList.add(ok ? 'text-emerald-400' : 'text-rose-400');
-        };
-
-        fetch('/api/contact', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-        })
-            .then(async (response) => {
-                let body = {};
-                try { body = await response.json(); } catch (_) { /* ignore */ }
-                if (!response.ok || !body.ok) {
-                    const msg = (body.errors && body.errors.length)
-                        ? body.errors.join(' ')
-                        : (body.error || `Server responded ${response.status}`);
-                    throw new Error(msg);
-                }
-                return body;
-            })
-            .then(() => {
-                form.reset();
-                setStatus('✓ Thanks — your message has been sent.', true);
-            })
-            .catch((err) => {
-                console.error('[contact] failed:', err);
-                setStatus(`✗ ${err.message || 'Could not send message — try again later.'}`, false);
-            })
-            .finally(() => {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-70');
-                }
-                setTimeout(() => status?.classList.add('hidden'), 5000);
-            });
-    };
-
-    /* ----------------------------------------------------------------------
-       10) Subtle parallax on hero orbs (only on desktop, very small)
+       9) Subtle parallax on hero orbs (only on desktop, very small)
        ---------------------------------------------------------------------- */
     if (window.matchMedia('(min-width: 1024px)').matches) {
         const orbs = document.querySelectorAll('.animate-float, .animate-float-delay');

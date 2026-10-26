@@ -134,6 +134,11 @@ main, header, footer {
     border-color: rgba(99, 102, 241, 0.5);
     box-shadow: 0 8px 20px -8px rgba(99, 102, 241, 0.6);
 }
+.social-icon[href^="https://linkedin.com"],
+.social-icon[href^="https://twitter.com"],
+.social-icon[href^="https://x.com"] {
+    display: none;
+}
 
 /* ==========================================================================
    About / Info / Stats
@@ -162,36 +167,6 @@ main, header, footer {
     color: rgb(226 232 240); /* slate-200 */
     font-weight: 500;
     font-size: 0.95rem;
-}
-
-.stat-card {
-    text-align: center;
-    padding: 1.5rem 1rem;
-    border-radius: 1rem;
-    background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    transition: all 0.3s ease;
-}
-.stat-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(99, 102, 241, 0.4);
-    box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.5);
-}
-.stat-number {
-    font-size: clamp(1.75rem, 4vw, 2.5rem);
-    font-weight: 800;
-    line-height: 1;
-    background: linear-gradient(135deg, #60a5fa, #a78bfa);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    margin-bottom: 0.5rem;
-}
-.stat-label {
-    font-size: 0.85rem;
-    color: rgb(148 163 184); /* slate-400 */
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
 }
 
 /* ==========================================================================
@@ -240,6 +215,21 @@ main, header, footer {
     color: white;
     margin-bottom: 0.5rem;
 }
+
+/* The card title doubles as the mobile accordion trigger.
+   Reset it so it renders exactly like the original plain heading. */
+.skill-toggle {
+    display: inline;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    line-height: inherit;
+    text-align: left;
+    cursor: pointer;
+}
 .skill-desc {
     font-size: 0.875rem;
     color: rgb(148 163 184);
@@ -260,6 +250,102 @@ main, header, footer {
 .skill-tag:hover {
     background-color: rgba(99, 102, 241, 0.2);
     border-color: rgba(99, 102, 241, 0.4);
+}
+
+@media (max-width: 767px) {
+    /* ---------- Skills: accordion list ----------
+       One compact row per skill so all six are visible at once.
+       Tap the title to expand the description + tags. */
+
+    #skills .skills-card-stack {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    #skills .skill-card {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-areas:
+            'icon title chevron'
+            'body  body  body';
+        align-items: center;
+        column-gap: 0.85rem;
+        padding: 1rem 1.1rem;
+        cursor: pointer;
+        transition: border-color 0.3s ease, background-color 0.3s ease;
+    }
+
+    /* Touch devices can stick :hover after a tap — keep the row flat. */
+    #skills .skill-card:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    #skills .skill-card.is-open {
+        border-color: rgba(99, 102, 241, 0.45);
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.09), rgba(168, 85, 247, 0.05));
+    }
+
+    #skills .skill-icon {
+        grid-area: icon;
+        margin-bottom: 0;
+    }
+
+    #skills .skill-title {
+        grid-area: title;
+        margin-bottom: 0;
+        font-size: 1.05rem;
+    }
+
+    #skills .skill-body {
+        grid-area: body;
+        display: grid;
+        grid-template-rows: 0fr;
+        margin-top: 0;
+        transition: grid-template-rows 0.36s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    #skills .skill-body > .skill-body-inner {
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    #skills .skill-card.is-open .skill-body {
+        grid-template-rows: 1fr;
+        margin-top: 0.85rem;
+    }
+
+    /* Chevron affordance — drawn with borders, so no extra markup needed. */
+    #skills .skill-card::after {
+        content: '';
+        grid-area: chevron;
+        width: 0.55rem;
+        height: 0.55rem;
+        margin-right: 0.3rem;
+        border-right: 2px solid rgb(148 163 184);
+        border-bottom: 2px solid rgb(148 163 184);
+        transform: rotate(45deg) translate(-2px, -2px);
+        transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    #skills .skill-card.is-open::after {
+        transform: rotate(-135deg) translate(-2px, -2px);
+        border-color: rgb(129 140 248);
+    }
+}
+
+/* Desktop keeps the original grid card exactly as it was — the collapsible
+   wrapper is layout-neutral and the title is plain, non-interactive text. */
+@media (min-width: 768px) {
+    #skills .skill-body,
+    #skills .skill-body-inner {
+        display: contents;
+    }
+
+    #skills .skill-toggle {
+        cursor: default;
+        pointer-events: none;
+    }
 }
 
 /* ==========================================================================
@@ -311,12 +397,15 @@ main, header, footer {
     text-transform: uppercase;
 }
 
-.project-icon {
-    position: relative;
-    z-index: 1;
+.project-thumbnail {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     transition: transform 0.5s ease;
 }
-.project-card:hover .project-icon { transform: scale(1.15) rotate(-5deg); }
+.project-card:hover .project-thumbnail { transform: scale(1.05); }
 
 .tech-pill {
     display: inline-block;
@@ -350,6 +439,76 @@ main, header, footer {
     transform: translateY(-2px);
 }
 
+@media (max-width: 767px) {
+    #projects .projects-scroll-track.is-project-sequence {
+        position: relative;
+        height: 226vh;
+        height: 226svh;
+        overflow: clip;
+    }
+
+    #projects .project-card-stack.is-project-sequence {
+        position: sticky;
+        top: max(4rem, 6vh);
+        top: max(4rem, 6svh);
+        display: block;
+        height: min(86vh, calc(100vh - max(4rem, 6vh) - 1rem));
+        height: min(86svh, calc(100svh - max(4rem, 6svh) - 1rem));
+    }
+
+    #projects .project-card.is-project-sequence-card {
+        position: absolute;
+        inset: 0;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(8, 13, 27, 0.98));
+        box-shadow: 0 18px 35px -24px rgba(99, 102, 241, 0.65);
+        transform-origin: center center;
+        transition: none;
+        will-change: transform;
+    }
+
+    #projects .project-card.is-project-sequence-card .project-image {
+        flex: 0 0 auto;
+        aspect-ratio: 16 / 9;
+    }
+
+    #projects .project-card.is-project-sequence-card > div:last-child {
+        padding: 1.25rem;
+    }
+
+    #projects .project-card.is-project-sequence-card > * {
+        opacity: 0;
+    }
+
+    #projects .project-card.is-project-sequence-card.has-visible-content > * {
+        opacity: 1;
+    }
+}
+
+/* ==========================================================================
+   Tablet layout refinements
+   ========================================================================== */
+@media (min-width: 1024px) and (max-width: 1279px) {
+    #home .grid.items-center { gap: 2rem; }
+    #home h1 { font-size: clamp(3.5rem, 5vw, 4rem); }
+    #home .animate-float > .relative { padding: 1.25rem; }
+    #home pre { font-size: 0.75rem; line-height: 1.5; }
+
+    #skills .skills-card-stack,
+    #projects .project-card-stack {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #projects .project-card-stack > :last-child {
+        grid-column: 1 / -1;
+        width: calc(50% - 0.75rem);
+        justify-self: center;
+    }
+}
+
 /* ==========================================================================
    Education timeline
    ========================================================================== */
@@ -357,6 +516,27 @@ main, header, footer {
     position: relative;
     margin-bottom: 2.5rem;
     padding-left: 3rem;
+}
+.timeline-track::after {
+    content: '';
+    position: absolute;
+    top: 1.5625rem; /* Centers on the first timeline dot before traveling. */
+    left: 50%;
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #60a5fa, #a855f7);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2), 0 0 16px rgba(129, 140, 248, 0.85);
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 3;
+    animation: timeline-bubble-travel 6s linear infinite;
+}
+@keyframes timeline-bubble-travel {
+    0% { top: 1.5625rem; opacity: 0; }
+    8% { opacity: 1; }
+    92% { opacity: 1; }
+    100% { top: calc(100% - 0.875rem); opacity: 0; }
 }
 @media (min-width: 640px) {
     .timeline-item {
@@ -385,6 +565,9 @@ main, header, footer {
 }
 @media (min-width: 640px) {
     .timeline-dot { left: -0.7rem; }
+}
+@media (max-width: 639px) {
+    #education .timeline-dot { left: 0.5rem; }
 }
 
 .timeline-card {
@@ -468,34 +651,6 @@ main, header, footer {
     backdrop-filter: blur(10px);
 }
 
-.form-label {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: rgb(203 213 225);
-    margin-bottom: 0.4rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-.form-input {
-    display: block;
-    width: 100%;
-    padding: 0.75rem 1rem;
-    font-size: 0.95rem;
-    color: white;
-    background-color: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.5rem;
-    transition: all 0.2s ease;
-    outline: none;
-}
-.form-input::placeholder { color: rgb(100 116 139); }
-.form-input:focus {
-    border-color: rgb(99 102 241);
-    background-color: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-}
-
 /* ==========================================================================
    Scroll-triggered animations
    ========================================================================== */
@@ -525,6 +680,7 @@ main, header, footer {
         scroll-behavior: auto !important;
     }
     [data-animate] { opacity: 1; transform: none; }
+    .timeline-track::after { display: none; }
 }
 
 /* ==========================================================================
