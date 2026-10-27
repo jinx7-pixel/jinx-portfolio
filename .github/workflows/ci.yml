@@ -1,0 +1,52 @@
+name: CI
+
+# Static-site checks for the portfolio.
+#
+# The site has no build step, so there is nothing to compile. What can break
+# silently is a reference to a file that is not there — a renamed image, a
+# deleted stylesheet, a script path typo. This workflow catches that, plus a
+# couple of cheap hygiene rules, before the change reaches `main`.
+#
+# Only `actions/*` first-party actions are used, matching the convention in the
+# other repositories.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version: '24'
+
+      - name: Verify every local asset reference resolves
+        run: node .github/scripts/check-assets.mjs
+
+      - name: Verify no secret files are committed
+        run: |
+          if git ls-files --error-unmatch .env >/dev/null 2>&1; then
+            echo "::error::.env is tracked in git. Remove it and rotate any credentials in it."
+            exit 1
+          fi
+          echo "ok - no .env tracked"
+
+      - name: Verify the contact form has a working endpoint
+        run: node .github/scripts/check-contact.mjs
