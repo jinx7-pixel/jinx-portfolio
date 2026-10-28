@@ -445,6 +445,9 @@ main, header, footer {
         height: 226vh;
         height: 226svh;
         overflow: clip;
+        /* The deck animates itself; browser scroll-anchoring must not fight it
+           when a lazy image above finishes loading and shifts the page. */
+        overflow-anchor: none;
     }
 
     #projects .project-card-stack.is-project-sequence {
@@ -454,6 +457,7 @@ main, header, footer {
         display: block;
         height: min(86vh, calc(100vh - max(4rem, 6vh) - 1rem));
         height: min(86svh, calc(100svh - max(4rem, 6svh) - 1rem));
+        overflow-anchor: none;
     }
 
     #projects .project-card.is-project-sequence-card {
