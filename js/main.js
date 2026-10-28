@@ -152,12 +152,25 @@
         let projectScrollFrame = null;
         let renderedProjectPosition = null;
 
+        // Auto-advance: the deck plays itself so a visitor never has to scroll
+        // just to see all three projects. Any scroll hands control back to the
+        // visitor, and the timer only resumes once scrolling has been idle.
+        const AUTO_ADVANCE_MS = 4500;   // how long one card stays on screen
+        const SCROLL_IDLE_MS = 4000;    // idle time before the timer takes over again
+        const MAX_FRAME_MS = 100;       // cap dt so a throttled/paused rAF can never jump ahead
+        let autoMode = true;            // true = timer drives, false = scroll drives
+        let autoPosition = 0;           // timer-driven position
+        let lastTickTime = null;        // last animation-frame timestamp
+        let lastScrollTime = -Infinity; // last scroll / pointer-activity timestamp
+
         const clampProjectProgress = (value, min, max) => Math.min(max, Math.max(min, value));
         const easeProjectProgress = (value) => value * value * (3 - (2 * value));
 
-        function updateProjectStack() {
+        function updateProjectStack(timestamp) {
             projectScrollFrame = null;
             if (!projectSequenceEnabled) return;
+
+            const now = typeof timestamp === 'number' ? timestamp : performance.now();
 
             const trackRect = projectsTrack.getBoundingClientRect();
             const stackHeight = projectsStack.getBoundingClientRect().height;
@@ -166,12 +179,36 @@
             const scrollRange = Math.max(1, trackHeight - stackHeight);
             const trackDocumentTop = window.scrollY + trackRect.top;
             const sequenceStart = trackDocumentTop - stickyTop;
-            const progress = clampProjectProgress(
-                (window.scrollY - sequenceStart) / scrollRange,
-                0,
-                1
-            );
-            const targetPosition = progress * (projectCards.length - 1);
+
+            // Only play the deck while the section is actually on screen.
+            const sectionInView = trackRect.top < window.innerHeight && trackRect.bottom > 0;
+
+            // Hand control back to the timer once the visitor stops scrolling.
+            if (!autoMode && (now - lastScrollTime) > SCROLL_IDLE_MS) {
+                autoMode = true;
+                autoPosition = renderedProjectPosition ?? 0; // continue from here, no jump
+                lastTickTime = now;                          // ignore the idle gap
+            }
+
+            let targetPosition;
+            if (autoMode) {
+                const dt = lastTickTime === null ? 0 : Math.min(now - lastTickTime, MAX_FRAME_MS);
+                lastTickTime = now;
+                if (sectionInView) {
+                    autoPosition += dt / AUTO_ADVANCE_MS;
+                }
+                autoPosition = Math.min(autoPosition, projectCards.length - 1);
+                targetPosition = autoPosition;
+            } else {
+                lastTickTime = now;
+                const progress = clampProjectProgress(
+                    (window.scrollY - sequenceStart) / scrollRange,
+                    0,
+                    1
+                );
+                targetPosition = progress * (projectCards.length - 1);
+            }
+
             renderedProjectPosition = renderedProjectPosition === null
                 ? targetPosition
                 : renderedProjectPosition + ((targetPosition - renderedProjectPosition) * 0.18);
@@ -229,7 +266,19 @@
                 card.classList.toggle('has-visible-content', index === visibleCardIndex);
             });
 
-            if (Math.abs(targetPosition - renderedProjectPosition) > 0.001) {
+            // Keep the animation loop alive.
+            // In scroll mode the loop only needs to run while the rendered position
+            // is still catching up — but it must ALSO keep ticking while we are
+            // waiting out the idle timeout, otherwise the moment the visitor stops
+            // scrolling is never detected and the timer never comes back.
+            const idleFor = now - lastScrollTime;
+            const autoHasReachedEnd = autoPosition >= projectCards.length - 1;
+            const waitingForIdleResume = !autoMode && idleFor <= SCROLL_IDLE_MS;
+            const shouldKeepTicking = autoMode
+                ? (sectionInView && !autoHasReachedEnd)
+                : (waitingForIdleResume || Math.abs(targetPosition - renderedProjectPosition) > 0.001);
+
+            if (shouldKeepTicking) {
                 scheduleProjectStackUpdate();
             }
         }
@@ -243,11 +292,19 @@
             if (!projectSequenceEnabled) return;
             projectSequenceEnabled = false;
             window.removeEventListener('scroll', scheduleProjectStackUpdate);
+            window.removeEventListener('wheel', onProjectScrollIntent);
+            window.removeEventListener('touchmove', onProjectScrollIntent);
+            window.removeEventListener('keydown', onProjectKeydown);
             window.removeEventListener('resize', scheduleProjectStackUpdate);
+            projectsTrack.removeEventListener('pointerdown', onProjectPointerActivity);
+            projectsTrack.removeEventListener('touchstart', onProjectPointerActivity);
             if (projectScrollFrame !== null) {
                 window.cancelAnimationFrame(projectScrollFrame);
                 projectScrollFrame = null;
             }
+            autoMode = true;
+            autoPosition = 0;
+            lastTickTime = null;
 
             projectsTrack.classList.remove('is-project-sequence');
             projectsStack.classList.remove('is-project-sequence');
@@ -260,6 +317,29 @@
             });
         }
 
+        // User scroll *intent* — not the scroll event itself — hands control to the
+        // visitor. Layout shifts (lazy images finishing their load, font swaps, the
+        // accordion opening) also fire scroll events, and those must never cancel
+        // the auto-advance. Wheel / touchmove / scroll keys are the real signals.
+        const SCROLL_INTENT_KEYS = new Set([
+            'PageUp', 'PageDown', 'ArrowUp', 'ArrowDown', 'Home', 'End', ' ', 'Spacebar',
+        ]);
+
+        function onProjectScrollIntent() {
+            lastScrollTime = performance.now();
+            autoMode = false;
+            scheduleProjectStackUpdate();
+        }
+
+        function onProjectKeydown(event) {
+            if (SCROLL_INTENT_KEYS.has(event.key)) onProjectScrollIntent();
+        }
+
+        // Touching the deck (reading a card, tapping a link) also counts as activity.
+        function onProjectPointerActivity() {
+            lastScrollTime = performance.now();
+        }
+
         function startProjectSequence() {
             if (projectSequenceEnabled) return;
             projectSequenceEnabled = true;
@@ -267,8 +347,16 @@
             projectsStack.classList.add('is-project-sequence');
             projectCards.forEach((card) => card.classList.add('is-project-sequence-card'));
             window.addEventListener('scroll', scheduleProjectStackUpdate, { passive: true });
+            window.addEventListener('wheel', onProjectScrollIntent, { passive: true });
+            window.addEventListener('touchmove', onProjectScrollIntent, { passive: true });
+            window.addEventListener('keydown', onProjectKeydown, { passive: true });
             window.addEventListener('resize', scheduleProjectStackUpdate, { passive: true });
-            updateProjectStack();
+            projectsTrack.addEventListener('pointerdown', onProjectPointerActivity, { passive: true });
+            projectsTrack.addEventListener('touchstart', onProjectPointerActivity, { passive: true });
+            autoMode = true;
+            autoPosition = 0;
+            lastTickTime = null;
+            updateProjectStack(performance.now());
         }
 
         function syncProjectSequenceMode() {
