@@ -37,6 +37,96 @@ main, header, footer {
 }
 ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #60a5fa, #a78bfa); }
 
+
+/* ==========================================================================
+   Opening wordmark
+   ========================================================================== */
+.portfolio-intro {
+    display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .portfolio-intro {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(ellipse at center, #111c3a, #020617 70%);
+        touch-action: none;
+        animation: intro-reveal-page 2s ease-in-out forwards;
+    }
+
+    .portfolio-intro svg {
+        width: min(94vw, 54rem);
+        height: auto;
+    }
+
+    /* Keep keyboard focus visible if someone tabs before the intro finishes. */
+    body:focus-within .portfolio-intro {
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+
+    .intro-particle {
+        opacity: 0;
+        animation: intro-drift 270ms ease-out var(--dot-delay) both;
+    }
+
+    .intro-letter {
+        --letter-delay: calc(120ms + var(--letter-index) * 370ms);
+        --fill-delay: calc(var(--letter-delay) + 270ms);
+        --fill-duration: 90ms;
+    }
+
+    .intro-outline {
+        fill: none;
+        stroke: #dbeafe;
+        stroke-width: 1.35;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        animation: intro-draw 180ms linear calc(var(--letter-delay) + 40ms) forwards,
+                   intro-fade-out var(--fill-duration) ease-out var(--fill-delay) forwards;
+    }
+
+    .intro-points {
+        fill: #f8fafc;
+        opacity: 0;
+        animation: intro-fade-in 60ms ease-out var(--letter-delay) forwards,
+                   intro-fade-out var(--fill-duration) ease-out var(--fill-delay) forwards;
+    }
+
+    .intro-fill {
+        fill: url(#intro-ink);
+        opacity: 0;
+        animation: intro-fade-in var(--fill-duration) ease-out var(--fill-delay) forwards;
+    }
+}
+
+@keyframes intro-drift {
+    20%, 65% { opacity: 1; }
+    to { opacity: 0; transform: translate(var(--dot-x), var(--dot-y)); }
+}
+
+@keyframes intro-draw {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes intro-fade-out {
+    to { opacity: 0; }
+}
+
+@keyframes intro-fade-in {
+    to { opacity: 1; }
+}
+
+@keyframes intro-reveal-page {
+    85% { opacity: 1; }
+    to { opacity: 0; visibility: hidden; }
+}
+
 /* ==========================================================================
    Navbar
    ========================================================================== */
@@ -357,10 +447,8 @@ main, header, footer {
     background-color: rgba(15, 23, 42, 0.5); /* slate-900/50 */
     border: 1px solid rgba(255, 255, 255, 0.08);
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .project-card:hover {
-    transform: translateY(-8px);
     border-color: rgba(99, 102, 241, 0.4);
     box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.4);
 }
@@ -403,9 +491,7 @@ main, header, footer {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.5s ease;
 }
-.project-card:hover .project-thumbnail { transform: scale(1.05); }
 
 .tech-pill {
     display: inline-block;
@@ -430,66 +516,11 @@ main, header, footer {
     border: 1px solid rgba(99, 102, 241, 0.3);
     border-radius: 0.5rem;
     background-color: rgba(99, 102, 241, 0.05);
-    transition: all 0.3s ease;
 }
 .project-link:hover {
     background-color: rgba(99, 102, 241, 0.15);
     color: white;
     border-color: rgba(99, 102, 241, 0.6);
-    transform: translateY(-2px);
-}
-
-@media (max-width: 767px) {
-    #projects .projects-scroll-track.is-project-sequence {
-        position: relative;
-        height: 226vh;
-        height: 226svh;
-        overflow: clip;
-        /* The deck animates itself; browser scroll-anchoring must not fight it
-           when a lazy image above finishes loading and shifts the page. */
-        overflow-anchor: none;
-    }
-
-    #projects .project-card-stack.is-project-sequence {
-        position: sticky;
-        top: max(4rem, 6vh);
-        top: max(4rem, 6svh);
-        display: block;
-        height: min(86vh, calc(100vh - max(4rem, 6vh) - 1rem));
-        height: min(86svh, calc(100svh - max(4rem, 6svh) - 1rem));
-        overflow-anchor: none;
-    }
-
-    #projects .project-card.is-project-sequence-card {
-        position: absolute;
-        inset: 0;
-        box-sizing: border-box;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(8, 13, 27, 0.98));
-        box-shadow: 0 18px 35px -24px rgba(99, 102, 241, 0.65);
-        transform-origin: center center;
-        transition: none;
-        will-change: transform;
-    }
-
-    #projects .project-card.is-project-sequence-card .project-image {
-        flex: 0 0 auto;
-        aspect-ratio: 16 / 9;
-    }
-
-    #projects .project-card.is-project-sequence-card > div:last-child {
-        padding: 1.25rem;
-    }
-
-    #projects .project-card.is-project-sequence-card > * {
-        opacity: 0;
-    }
-
-    #projects .project-card.is-project-sequence-card.has-visible-content > * {
-        opacity: 1;
-    }
 }
 
 /* ==========================================================================
@@ -501,11 +532,12 @@ main, header, footer {
     #home .animate-float > .relative { padding: 1.25rem; }
     #home pre { font-size: 0.75rem; line-height: 1.5; }
 
-    #skills .skills-card-stack,
-    #projects .project-card-stack {
+    #skills .skills-card-stack {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+}
 
+@media (min-width: 768px) and (max-width: 1279px) {
     #projects .project-card-stack > :last-child {
         grid-column: 1 / -1;
         width: calc(50% - 0.75rem);

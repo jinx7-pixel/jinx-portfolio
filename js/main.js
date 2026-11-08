@@ -50,7 +50,7 @@
        2) Navbar scroll behavior + active-link spy
        ---------------------------------------------------------------------- */
     const navbar = document.getElementById('navbar');
-    const sections = ['home', 'about', 'skills', 'projects', 'education', 'contact']
+    const sections = ['home', 'projects', 'about', 'skills', 'education', 'contact']
         .map((id) => document.getElementById(id))
         .filter(Boolean);
 
@@ -100,6 +100,21 @@
         });
     });
 
+    const contactEmail = document.getElementById('contact-email');
+    const copyEmailButton = document.getElementById('copy-email');
+    const copyEmailStatus = document.getElementById('copy-email-status');
+
+    if (contactEmail && copyEmailButton && copyEmailStatus) {
+        copyEmailButton.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(contactEmail.textContent.trim());
+                copyEmailStatus.textContent = 'Email address copied.';
+            } catch {
+                copyEmailStatus.textContent = 'Select the email address to copy it manually.';
+            }
+        });
+    }
+
     /* ----------------------------------------------------------------------
        4) Scroll-triggered reveal animations (IntersectionObserver)
        ---------------------------------------------------------------------- */
@@ -134,248 +149,6 @@
             i++;
         });
     });
-
-    /* ----------------------------------------------------------------------
-       Mobile-only scroll sequence for the Projects cards
-       ---------------------------------------------------------------------- */
-    const projectsSection = document.getElementById('projects');
-    const projectsTrack = projectsSection?.querySelector('.projects-scroll-track');
-    const projectsStack = projectsSection?.querySelector('.project-card-stack');
-    const projectCards = projectsStack
-        ? Array.from(projectsStack.querySelectorAll('.project-card'))
-        : [];
-
-    if (projectsTrack && projectsStack && projectCards.length === 3) {
-        const mobileProjectsQuery = window.matchMedia('(max-width: 767px)');
-        const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-        let projectSequenceEnabled = false;
-        let projectScrollFrame = null;
-        let renderedProjectPosition = null;
-
-        // Auto-advance: the deck plays itself so a visitor never has to scroll
-        // just to see all three projects. Any scroll hands control back to the
-        // visitor, and the timer only resumes once scrolling has been idle.
-        const AUTO_ADVANCE_MS = 4500;   // how long one card stays on screen
-        const SCROLL_IDLE_MS = 4000;    // idle time before the timer takes over again
-        const MAX_FRAME_MS = 100;       // cap dt so a throttled/paused rAF can never jump ahead
-        let autoMode = true;            // true = timer drives, false = scroll drives
-        let autoPosition = 0;           // timer-driven position
-        let lastTickTime = null;        // last animation-frame timestamp
-        let lastScrollTime = -Infinity; // last scroll / pointer-activity timestamp
-
-        const clampProjectProgress = (value, min, max) => Math.min(max, Math.max(min, value));
-        const easeProjectProgress = (value) => value * value * (3 - (2 * value));
-
-        function updateProjectStack(timestamp) {
-            projectScrollFrame = null;
-            if (!projectSequenceEnabled) return;
-
-            const now = typeof timestamp === 'number' ? timestamp : performance.now();
-
-            const trackRect = projectsTrack.getBoundingClientRect();
-            const stackHeight = projectsStack.getBoundingClientRect().height;
-            const trackHeight = trackRect.height;
-            const stickyTop = parseFloat(window.getComputedStyle(projectsStack).top) || 0;
-            const scrollRange = Math.max(1, trackHeight - stackHeight);
-            const trackDocumentTop = window.scrollY + trackRect.top;
-            const sequenceStart = trackDocumentTop - stickyTop;
-
-            // Only play the deck while the section is actually on screen.
-            const sectionInView = trackRect.top < window.innerHeight && trackRect.bottom > 0;
-
-            // Hand control back to the timer once the visitor stops scrolling.
-            if (!autoMode && (now - lastScrollTime) > SCROLL_IDLE_MS) {
-                autoMode = true;
-                autoPosition = renderedProjectPosition ?? 0; // continue from here, no jump
-                lastTickTime = now;                          // ignore the idle gap
-            }
-
-            let targetPosition;
-            if (autoMode) {
-                const dt = lastTickTime === null ? 0 : Math.min(now - lastTickTime, MAX_FRAME_MS);
-                lastTickTime = now;
-                if (sectionInView) {
-                    autoPosition += dt / AUTO_ADVANCE_MS;
-                }
-                autoPosition = Math.min(autoPosition, projectCards.length - 1);
-                targetPosition = autoPosition;
-            } else {
-                lastTickTime = now;
-                const progress = clampProjectProgress(
-                    (window.scrollY - sequenceStart) / scrollRange,
-                    0,
-                    1
-                );
-                targetPosition = progress * (projectCards.length - 1);
-            }
-
-            renderedProjectPosition = renderedProjectPosition === null
-                ? targetPosition
-                : renderedProjectPosition + ((targetPosition - renderedProjectPosition) * 0.18);
-
-            const sequencePosition = renderedProjectPosition;
-            const activeIndex = Math.min(
-                projectCards.length - 1,
-                Math.floor(sequencePosition)
-            );
-            const segmentProgress = activeIndex === projectCards.length - 1
-                ? 0
-                : sequencePosition - activeIndex;
-            const exitProgress = clampProjectProgress((segmentProgress - 0.5) * 2, 0, 1);
-            const visibleCardIndex = Math.min(
-                projectCards.length - 1,
-                Math.round(sequencePosition)
-            );
-            const entryOffset = (stackHeight * 0.2) + 16;
-
-            projectCards.forEach((card, index) => {
-                let y = 0;
-                let scale = 1;
-                let opacity = 1;
-                let zIndex = 100;
-
-                if (index < activeIndex) {
-                    y = -stackHeight * 1.08;
-                    scale = 0.94;
-                    opacity = 0.18;
-                    zIndex = 10 + index;
-                } else if (index === activeIndex) {
-                    y = -stackHeight * 1.08 * exitProgress;
-                    scale = 1 - (0.06 * exitProgress);
-                    zIndex = segmentProgress < 0.5 ? 200 : 190;
-                } else if (index === activeIndex + 1) {
-                    const entryProgress = easeProjectProgress(segmentProgress);
-                    y = entryOffset * (1 - entryProgress);
-                    scale = 0.96 + (0.04 * entryProgress);
-                    opacity = 0.6 + (0.4 * entryProgress);
-                    zIndex = segmentProgress >= 0.5 ? 201 : 150 - index;
-                } else {
-                    const isPreparingNext = index === activeIndex + 2;
-                    const prepareProgress = isPreparingNext
-                        ? easeProjectProgress(clampProjectProgress((segmentProgress - 0.76) / 0.24, 0, 1))
-                        : 0;
-                    y = 16 + ((entryOffset - 16) * prepareProgress);
-                    scale = 0.92 + (0.04 * prepareProgress);
-                    opacity = 0.18 + (0.42 * prepareProgress);
-                    zIndex = 120 - index;
-                }
-
-                card.style.transform = `translate3d(0, ${y}px, 0) scale(${scale})`;
-                card.style.opacity = String(opacity);
-                card.style.zIndex = String(zIndex);
-                card.classList.toggle('has-visible-content', index === visibleCardIndex);
-            });
-
-            // Keep the animation loop alive.
-            // In scroll mode the loop only needs to run while the rendered position
-            // is still catching up — but it must ALSO keep ticking while we are
-            // waiting out the idle timeout, otherwise the moment the visitor stops
-            // scrolling is never detected and the timer never comes back.
-            const idleFor = now - lastScrollTime;
-            const autoHasReachedEnd = autoPosition >= projectCards.length - 1;
-            const waitingForIdleResume = !autoMode && idleFor <= SCROLL_IDLE_MS;
-            const shouldKeepTicking = autoMode
-                ? (sectionInView && !autoHasReachedEnd)
-                : (waitingForIdleResume || Math.abs(targetPosition - renderedProjectPosition) > 0.001);
-
-            if (shouldKeepTicking) {
-                scheduleProjectStackUpdate();
-            }
-        }
-
-        function scheduleProjectStackUpdate() {
-            if (!projectSequenceEnabled || projectScrollFrame !== null) return;
-            projectScrollFrame = window.requestAnimationFrame(updateProjectStack);
-        }
-
-        function stopProjectSequence() {
-            if (!projectSequenceEnabled) return;
-            projectSequenceEnabled = false;
-            window.removeEventListener('scroll', scheduleProjectStackUpdate);
-            window.removeEventListener('wheel', onProjectScrollIntent);
-            window.removeEventListener('touchmove', onProjectScrollIntent);
-            window.removeEventListener('keydown', onProjectKeydown);
-            window.removeEventListener('resize', scheduleProjectStackUpdate);
-            projectsTrack.removeEventListener('pointerdown', onProjectPointerActivity);
-            projectsTrack.removeEventListener('touchstart', onProjectPointerActivity);
-            if (projectScrollFrame !== null) {
-                window.cancelAnimationFrame(projectScrollFrame);
-                projectScrollFrame = null;
-            }
-            autoMode = true;
-            autoPosition = 0;
-            lastTickTime = null;
-
-            projectsTrack.classList.remove('is-project-sequence');
-            projectsStack.classList.remove('is-project-sequence');
-            renderedProjectPosition = null;
-            projectCards.forEach((card) => {
-                card.classList.remove('is-project-sequence-card', 'has-visible-content');
-                card.style.removeProperty('transform');
-                card.style.removeProperty('opacity');
-                card.style.removeProperty('z-index');
-            });
-        }
-
-        // User scroll *intent* — not the scroll event itself — hands control to the
-        // visitor. Layout shifts (lazy images finishing their load, font swaps, the
-        // accordion opening) also fire scroll events, and those must never cancel
-        // the auto-advance. Wheel / touchmove / scroll keys are the real signals.
-        const SCROLL_INTENT_KEYS = new Set([
-            'PageUp', 'PageDown', 'ArrowUp', 'ArrowDown', 'Home', 'End', ' ', 'Spacebar',
-        ]);
-
-        function onProjectScrollIntent() {
-            lastScrollTime = performance.now();
-            autoMode = false;
-            scheduleProjectStackUpdate();
-        }
-
-        function onProjectKeydown(event) {
-            if (SCROLL_INTENT_KEYS.has(event.key)) onProjectScrollIntent();
-        }
-
-        // Touching the deck (reading a card, tapping a link) also counts as activity.
-        function onProjectPointerActivity() {
-            lastScrollTime = performance.now();
-        }
-
-        function startProjectSequence() {
-            if (projectSequenceEnabled) return;
-            projectSequenceEnabled = true;
-            projectsTrack.classList.add('is-project-sequence');
-            projectsStack.classList.add('is-project-sequence');
-            projectCards.forEach((card) => card.classList.add('is-project-sequence-card'));
-            window.addEventListener('scroll', scheduleProjectStackUpdate, { passive: true });
-            window.addEventListener('wheel', onProjectScrollIntent, { passive: true });
-            window.addEventListener('touchmove', onProjectScrollIntent, { passive: true });
-            window.addEventListener('keydown', onProjectKeydown, { passive: true });
-            window.addEventListener('resize', scheduleProjectStackUpdate, { passive: true });
-            projectsTrack.addEventListener('pointerdown', onProjectPointerActivity, { passive: true });
-            projectsTrack.addEventListener('touchstart', onProjectPointerActivity, { passive: true });
-            autoMode = true;
-            autoPosition = 0;
-            lastTickTime = null;
-            updateProjectStack(performance.now());
-        }
-
-        function syncProjectSequenceMode() {
-            if (mobileProjectsQuery.matches && !reducedMotionQuery.matches) {
-                startProjectSequence();
-            } else {
-                stopProjectSequence();
-            }
-        }
-
-        [mobileProjectsQuery, reducedMotionQuery].forEach((mediaQuery) => {
-            if (typeof mediaQuery.addEventListener === 'function') {
-                mediaQuery.addEventListener('change', syncProjectSequenceMode);
-            } else {
-                mediaQuery.addListener(syncProjectSequenceMode);
-            }
-        });
-        syncProjectSequenceMode();
-    }
 
     /* ----------------------------------------------------------------------
        Mobile-only accordion for the Skills cards
