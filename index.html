@@ -60,6 +60,89 @@
 
 <body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500/40 selection:text-white">
 
+    <div class="portfolio-intro" aria-hidden="true">
+        <svg viewBox="0 0 555 164" focusable="false">
+            <defs>
+                <linearGradient id="intro-ink" x1="65" y1="82" x2="490" y2="82" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#60a5fa" />
+                    <stop offset="0.52" stop-color="#818cf8" />
+                    <stop offset="1" stop-color="#a855f7" />
+                </linearGradient>
+                <path id="intro-j" pathLength="1" d="M92 24H149V103C149 128 133 140 109 140C89 140 72 130 65 112L83 101C88 113 96 120 108 120C121 120 128 114 128 101V44H92Z" />
+                <path id="intro-i" pathLength="1" d="M174 24H237V44H217V117H237V137H174V117H195V44H174Z" />
+                <path id="intro-n" pathLength="1" d="M263 24H284L341 101V24H362V137H341L284 60V137H263Z" />
+                <path id="intro-x" pathLength="1" d="M388 24H414L438 61L463 24H488L451 79L490 137H464L438 98L412 137H387L426 79Z" />
+            </defs>
+            <g fill="#dbeafe">
+                <circle class="intro-particle" cx="12" cy="45" r="3.1" style="--dot-delay: 0ms; --dot-x: 77px; --dot-y: -21px;" />
+                <circle class="intro-particle" cx="24" cy="67" r="2.5" style="--dot-delay: 55ms; --dot-x: 77px; --dot-y: -43px;" />
+                <circle class="intro-particle" cx="10" cy="94" r="3.7" style="--dot-delay: 110ms; --dot-x: 105px; --dot-y: -70px;" />
+            </g>
+            <g class="intro-letter" style="--letter-index: 0">
+                <use class="intro-fill" href="#intro-j" />
+                <use class="intro-outline" href="#intro-j" />
+                <g class="intro-points">
+                    <circle cx="92" cy="24" r="4.1" />
+                    <circle cx="149" cy="24" r="4.1" />
+                    <circle cx="149" cy="103" r="4.1" />
+                    <circle cx="109" cy="140" r="4.1" />
+                    <circle cx="65" cy="112" r="4.1" />
+                    <circle cx="83" cy="101" r="4.1" />
+                    <circle cx="108" cy="120" r="4.1" />
+                    <circle cx="128" cy="44" r="4.1" />
+                </g>
+            </g>
+            <g class="intro-letter" style="--letter-index: 1">
+                <use class="intro-fill" href="#intro-i" />
+                <use class="intro-outline" href="#intro-i" />
+                <g class="intro-points">
+                    <circle cx="174" cy="24" r="4.1" />
+                    <circle cx="237" cy="24" r="4.1" />
+                    <circle cx="217" cy="44" r="4.1" />
+                    <circle cx="217" cy="117" r="4.1" />
+                    <circle cx="237" cy="137" r="4.1" />
+                    <circle cx="174" cy="137" r="4.1" />
+                    <circle cx="195" cy="117" r="4.1" />
+                    <circle cx="195" cy="44" r="4.1" />
+                </g>
+            </g>
+            <g class="intro-letter" style="--letter-index: 2">
+                <use class="intro-fill" href="#intro-n" />
+                <use class="intro-outline" href="#intro-n" />
+                <g class="intro-points">
+                    <circle cx="263" cy="24" r="4.1" />
+                    <circle cx="284" cy="24" r="4.1" />
+                    <circle cx="341" cy="101" r="4.1" />
+                    <circle cx="341" cy="24" r="4.1" />
+                    <circle cx="362" cy="24" r="4.1" />
+                    <circle cx="362" cy="137" r="4.1" />
+                    <circle cx="341" cy="137" r="4.1" />
+                    <circle cx="284" cy="60" r="4.1" />
+                    <circle cx="284" cy="137" r="4.1" />
+                    <circle cx="263" cy="137" r="4.1" />
+                </g>
+            </g>
+            <g class="intro-letter" style="--letter-index: 3">
+                <use class="intro-fill" href="#intro-x" />
+                <use class="intro-outline" href="#intro-x" />
+                <g class="intro-points">
+                    <circle cx="388" cy="24" r="4.1" />
+                    <circle cx="414" cy="24" r="4.1" />
+                    <circle cx="438" cy="61" r="4.1" />
+                    <circle cx="463" cy="24" r="4.1" />
+                    <circle cx="488" cy="24" r="4.1" />
+                    <circle cx="451" cy="79" r="4.1" />
+                    <circle cx="490" cy="137" r="4.1" />
+                    <circle cx="464" cy="137" r="4.1" />
+                    <circle cx="438" cy="98" r="4.1" />
+                    <circle cx="412" cy="137" r="4.1" />
+                    <circle cx="387" cy="137" r="4.1" />
+                    <circle cx="426" cy="79" r="4.1" />
+                </g>
+            </g>
+        </svg>
+    </div>
+
     <!-- ================================ -->
     <!--            NAVBAR                -->
     <!-- ================================ -->
@@ -77,9 +160,9 @@
                 <!-- Desktop links -->
                 <ul class="hidden xl:flex items-center gap-1">
                     <li><a href="#home"        class="nav-link">Home</a></li>
+                    <li><a href="#projects"    class="nav-link">Projects</a></li>
                     <li><a href="#about"       class="nav-link">About</a></li>
                     <li><a href="#skills"      class="nav-link">Skills</a></li>
-                    <li><a href="#projects"    class="nav-link">Projects</a></li>
                     <li><a href="#education"   class="nav-link">Education</a></li>
                     <li><a href="#contact"     class="nav-link">Contact</a></li>
                 </ul>
@@ -102,9 +185,9 @@
             <div id="mobile-menu" class="xl:hidden hidden pb-4">
                 <ul class="flex flex-col gap-1 p-2 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/10">
                     <li><a href="#home"        class="mobile-link">Home</a></li>
+                    <li><a href="#projects"    class="mobile-link">Projects</a></li>
                     <li><a href="#about"       class="mobile-link">About</a></li>
                     <li><a href="#skills"      class="mobile-link">Skills</a></li>
-                    <li><a href="#projects"    class="mobile-link">Projects</a></li>
                     <li><a href="#education"   class="mobile-link">Education</a></li>
                     <li><a href="#contact"     class="mobile-link">Contact</a></li>
                     <li class="pt-2 border-t border-white/10 mt-1">
@@ -226,10 +309,103 @@
             </div>
 
             <!-- Scroll indicator -->
-            <a href="#about" class="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2 text-slate-500 hover:text-slate-300 transition animate-bounce-slow" aria-label="Scroll to about section">
+            <a href="#projects" class="hidden md:flex absolute bottom-8 left-1/2 -translate-x-1/2 flex-col items-center gap-2 text-slate-500 hover:text-slate-300 transition animate-bounce-slow" aria-label="Scroll to projects section">
                 <span class="text-xs uppercase tracking-widest">Scroll</span>
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
             </a>
+        </section>
+
+        <!-- ================================ -->
+        <!--            PROJECTS              -->
+        <!-- ================================ -->
+        <section id="projects" class="py-20 md:py-28 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <p class="text-sm uppercase tracking-[0.3em] text-indigo-400 font-semibold mb-3">Selected work</p>
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold">
+                        My <span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Projects</span>
+                    </h2>
+                    <p class="mt-4 text-slate-400 max-w-2xl mx-auto">
+                        A few things I've built recently. Each one taught me something new.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6 project-card-stack">
+                    <article class="project-card group flex h-full flex-col">
+                        <div class="project-image bg-gradient-to-br from-blue-950 to-indigo-950">
+                            <img class="project-thumbnail" src="assets/rzfixer-home-screenshot.jpg" alt="Live RZ Fixer homepage with its repair request button" loading="lazy" decoding="async" />
+                            <div class="project-overlay">
+                                <span class="project-category">Live</span>
+                            </div>
+                        </div>
+                        <div class="p-6 flex flex-1 flex-col">
+                            <h3 class="text-xl font-bold mb-2">RZ Home Appliances Care</h3>
+                            <p class="text-slate-400 text-sm mb-4 leading-relaxed">I built the appliance repair website, connected the repair request form to its API, and set up the Docker deployment.</p>
+                            <div class="flex flex-wrap gap-2 mb-5">
+                                <span class="tech-pill">Contact Form</span>
+                                <span class="tech-pill">Backend Integration</span>
+                            </div>
+                            <div class="flex gap-3 mt-auto pt-2">
+                                <a href="https://rzfixer.in" target="_blank" rel="noopener noreferrer" class="project-link">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    Live Demo
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project-card group flex h-full flex-col">
+                        <div class="project-image bg-gradient-to-br from-slate-950 to-indigo-950">
+                            <img class="project-thumbnail" src="assets/stockpilot-dashboard-screenshot.jpg" alt="StockPilot dashboard showing sample inventory and low-stock alerts" loading="lazy" decoding="async" />
+                            <div class="project-overlay">
+                                <span class="project-category">In Development</span>
+                            </div>
+                        </div>
+                        <div class="p-6 flex flex-1 flex-col">
+                            <h3 class="text-xl font-bold mb-2">StockPilot</h3>
+                            <p class="text-slate-400 text-sm mb-4 leading-relaxed">I built the inventory and sales workflows around a PostgreSQL stock ledger. When a sale is recorded, the app logs the movement and updates available stock.</p>
+                            <div class="flex flex-wrap gap-2 mb-5">
+                                <span class="tech-pill">React</span>
+                                <span class="tech-pill">TypeScript</span>
+                                <span class="tech-pill">Node.js</span>
+                                <span class="tech-pill">Express</span>
+                                <span class="tech-pill">PostgreSQL</span>
+                            </div>
+                            <div class="flex gap-3 mt-auto pt-2">
+                                <a href="https://github.com/jinx7-pixel/StockPilot" target="_blank" rel="noopener noreferrer" class="project-link">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.05-3.34.73-4.04-1.61-4.04-1.61-1.09-.74.08-.73.08-.73 1.21.09 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.3 3.5 1 .11-.78.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.31-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 016 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.87.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22 0 1.61-.01 2.9-.01 3.29 0 .32.22.7.83.58A12 12 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                                    View Code
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="project-card group flex h-full flex-col">
+                        <div class="project-image bg-gradient-to-br from-blue-950 to-purple-950">
+                            <img class="project-thumbnail" src="assets/developer-portfolio-illustration.jpg" alt="Illustration of a desktop portfolio layout beside a code symbol, with blue and violet lighting" loading="lazy" decoding="async" />
+                            <div class="project-overlay">
+                                <span class="project-category">Personal Project</span>
+                            </div>
+                        </div>
+                        <div class="p-6 flex flex-1 flex-col">
+                            <h3 class="text-xl font-bold mb-2">Developer Portfolio</h3>
+                            <p class="text-slate-400 text-sm mb-4 leading-relaxed">I designed and built this responsive portfolio with section navigation, project cards, and quick email contact.</p>
+                            <div class="flex flex-wrap gap-2 mb-5">
+                                <span class="tech-pill">HTML</span>
+                                <span class="tech-pill">CSS</span>
+                                <span class="tech-pill">Tailwind CSS</span>
+                                <span class="tech-pill">JavaScript</span>
+                            </div>
+                            <div class="flex gap-3 mt-auto pt-2">
+                                <a href="https://github.com/jinx7-pixel/developer-portfolio" target="_blank" rel="noopener noreferrer" class="project-link">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.05-3.34.73-4.04-1.61-4.04-1.61-1.09-.74.08-.73.08-.73 1.21.09 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.3 3.5 1 .11-.78.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.31-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 016 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.87.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22 0 1.61-.01 2.9-.01 3.29 0 .32.22.7.83.58A12 12 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                                    View Code
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
         </section>
 
         <!-- ================================ -->
@@ -443,101 +619,6 @@
         </section>
 
         <!-- ================================ -->
-        <!--            PROJECTS              -->
-        <!-- ================================ -->
-        <section id="projects" class="py-20 md:py-28 relative">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-16">
-                    <p data-animate class="text-sm uppercase tracking-[0.3em] text-indigo-400 font-semibold mb-3">Selected work</p>
-                    <h2 data-animate class="text-3xl sm:text-4xl md:text-5xl font-extrabold">
-                        My <span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Projects</span>
-                    </h2>
-                    <p data-animate class="mt-4 text-slate-400 max-w-2xl mx-auto">
-                        A few things I've built recently. Each one taught me something new.
-                    </p>
-                </div>
-
-                <div class="projects-scroll-track">
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 project-card-stack">
-                    <article data-animate class="project-card group flex h-full flex-col">
-                        <div class="project-image bg-gradient-to-br from-blue-950 to-indigo-950">
-                            <img class="project-thumbnail" src="assets/rz-home-appliances-care.jpg" alt="RZ Home Appliances Care technician repairing a washing machine in a home appliance showroom" loading="lazy" decoding="async" />
-                            <div class="project-overlay">
-                                <span class="project-category">Live</span>
-                            </div>
-                        </div>
-                        <div class="p-6 flex flex-1 flex-col">
-                            <h3 class="text-xl font-bold mb-2">RZ Home Appliances Care</h3>
-                            <p class="text-slate-400 text-sm mb-4 leading-relaxed">A home appliance repair service website with a contact form and backend integration.</p>
-                            <div class="flex flex-wrap gap-2 mb-5">
-                                <span class="tech-pill">Contact Form</span>
-                                <span class="tech-pill">Backend Integration</span>
-                            </div>
-                            <div class="flex gap-3 mt-auto pt-2">
-                                <a href="https://rzfixer.in" target="_blank" rel="noopener noreferrer" class="project-link">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                    Live Demo
-                                </a>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article data-animate class="project-card group flex h-full flex-col">
-                        <div class="project-image bg-gradient-to-br from-slate-950 to-indigo-950">
-                            <img class="project-thumbnail" src="assets/stockpilot-inventory-illustration.jpg" alt="Illustration of warehouse boxes and an inventory checklist with blue and violet lighting" loading="lazy" decoding="async" />
-                            <div class="project-overlay">
-                                <span class="project-category">In Development</span>
-                            </div>
-                        </div>
-                        <div class="p-6 flex flex-1 flex-col">
-                            <h3 class="text-xl font-bold mb-2">StockPilot</h3>
-                            <p class="text-slate-400 text-sm mb-4 leading-relaxed">An inventory management app in development with a React and TypeScript frontend, a Node.js/Express backend, and PostgreSQL. Current code includes product and category APIs, inventory movement tracking, and sales endpoints.</p>
-                            <div class="flex flex-wrap gap-2 mb-5">
-                                <span class="tech-pill">React</span>
-                                <span class="tech-pill">TypeScript</span>
-                                <span class="tech-pill">Node.js</span>
-                                <span class="tech-pill">Express</span>
-                                <span class="tech-pill">PostgreSQL</span>
-                            </div>
-                            <div class="flex gap-3 mt-auto pt-2">
-                                <a href="https://github.com/jinx7-pixel/StockPilot" target="_blank" rel="noopener noreferrer" class="project-link">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.05-3.34.73-4.04-1.61-4.04-1.61-1.09-.74.08-.73.08-.73 1.21.09 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.3 3.5 1 .11-.78.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.31-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 016 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.87.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22 0 1.61-.01 2.9-.01 3.29 0 .32.22.7.83.58A12 12 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                                    View Code
-                                </a>
-                            </div>
-                        </div>
-                    </article>
-
-                    <article data-animate class="project-card group flex h-full flex-col">
-                        <div class="project-image bg-gradient-to-br from-blue-950 to-purple-950">
-                            <img class="project-thumbnail" src="assets/developer-portfolio-illustration.jpg" alt="Illustration of a desktop portfolio layout beside a code symbol, with blue and violet lighting" loading="lazy" decoding="async" />
-                            <div class="project-overlay">
-                                <span class="project-category">Personal Project</span>
-                            </div>
-                        </div>
-                        <div class="p-6 flex flex-1 flex-col">
-                            <h3 class="text-xl font-bold mb-2">Developer Portfolio</h3>
-                            <p class="text-slate-400 text-sm mb-4 leading-relaxed">My responsive one-page portfolio showcases my work, skills, and projects, with section navigation, scroll-triggered animations, and email contact links.</p>
-                            <div class="flex flex-wrap gap-2 mb-5">
-                                <span class="tech-pill">HTML</span>
-                                <span class="tech-pill">CSS</span>
-                                <span class="tech-pill">Tailwind CSS</span>
-                                <span class="tech-pill">JavaScript</span>
-                            </div>
-                            <div class="flex gap-3 mt-auto pt-2">
-                                <a href="https://github.com/jinx7-pixel/developer-portfolio" target="_blank" rel="noopener noreferrer" class="project-link">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.05-3.34.73-4.04-1.61-4.04-1.61-1.09-.74.08-.73.08-.73 1.21.09 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.3 3.5 1 .11-.78.42-1.3.76-1.6-2.66-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.31-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 016 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.66.25 2.87.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.62-5.48 5.92.43.37.81 1.1.81 2.22 0 1.61-.01 2.9-.01 3.29 0 .32.22.7.83.58A12 12 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-                                    View Code
-                                </a>
-                            </div>
-                        </div>
-                    </article>
-                </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- ================================ -->
         <!--            EDUCATION             -->
         <!-- ================================ -->
         <section id="education" class="py-20 md:py-28 relative bg-slate-900/30">
@@ -604,7 +685,7 @@
                             </div>
                             <div>
                                 <p class="text-sm text-slate-400">Email</p>
-                                <a href="mailto:jinx4784@gmail.com" class="font-medium hover:text-indigo-400 transition">jinx4784@gmail.com</a>
+                                <a id="contact-email" href="mailto:jinx4784@gmail.com" class="font-medium hover:text-indigo-400 transition">jinx4784@gmail.com</a>
                             </div>
                         </div>
 
@@ -651,10 +732,16 @@
                         </div>
                         <h3 class="text-2xl sm:text-3xl font-bold mb-3">Have a project in mind?</h3>
                         <p class="text-slate-400 max-w-lg mb-7">Let's discuss your ideas and build something great together.</p>
-                        <a href="mailto:jinx4784@gmail.com?subject=Portfolio%20Inquiry" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold shadow-glow hover:shadow-glow-lg hover:scale-[1.02] transition-all duration-300">
-                            Contact via Gmail
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                        </a>
+                        <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:justify-center">
+                            <a href="mailto:jinx4784@gmail.com?subject=Portfolio%20Inquiry" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold shadow-glow hover:shadow-glow-lg hover:scale-[1.02] transition-all duration-300">
+                                Email me
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </a>
+                            <button id="copy-email" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 font-semibold transition-colors">
+                                Copy email
+                            </button>
+                        </div>
+                        <p id="copy-email-status" role="status" class="mt-3 min-h-5 text-sm text-slate-300"></p>
                     </div>
                 </div>
             </div>
@@ -673,9 +760,9 @@
                 </div>
 
                 <ul class="flex flex-wrap gap-x-6 gap-y-2 justify-center text-sm text-slate-400">
+                    <li><a href="#projects"  class="hover:text-white transition">Projects</a></li>
                     <li><a href="#about"     class="hover:text-white transition">About</a></li>
                     <li><a href="#skills"    class="hover:text-white transition">Skills</a></li>
-                    <li><a href="#projects"  class="hover:text-white transition">Projects</a></li>
                     <li><a href="#education" class="hover:text-white transition">Education</a></li>
                     <li><a href="#contact"   class="hover:text-white transition">Contact</a></li>
                 </ul>
