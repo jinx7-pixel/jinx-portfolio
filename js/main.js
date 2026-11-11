@@ -50,7 +50,7 @@
        2) Navbar scroll behavior + active-link spy
        ---------------------------------------------------------------------- */
     const navbar = document.getElementById('navbar');
-    const sections = ['home', 'projects', 'about', 'skills', 'education', 'contact']
+    const sections = ['home', 'projects', 'about', 'skills', 'contact']
         .map((id) => document.getElementById(id))
         .filter(Boolean);
 

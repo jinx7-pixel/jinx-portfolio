@@ -4,7 +4,7 @@ Personal portfolio for Jinx, a web developer. Explore my projects, the work I co
 
 [Open the live portfolio](https://jinx-portfolio.pages.dev/)
 
-![Desktop homepage of the Jinx portfolio, with navigation and links to projects and contact information](assets/portfolio-home-preview.jpg)
+![Desktop portfolio homepage showing the RZ Fixer · Live badge and links to projects and contact information](assets/portfolio-home-preview.jpg)
 
 ## Featured projects
 
